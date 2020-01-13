@@ -1,0 +1,52 @@
+FemMembranes.cpp
+FemMembranes.hpp
+MeshProcessSelection.hpp
+MeshProcessSelection.cpp
+FemMembranes.mdxv
+FemMembranesSecondPhase.mdxv
+FemMembranes.qrc
+FemMembranes.png
+Boxes.mdxm
+Circle20um.mdxm
+Circle20umAssigned.mdxm
+Circle20umAssignedSecondPhase.mdxm
+Circle20umAssgined21_02_19.mdxm
+Circle20um_testRefined.mdxm
+hexPalexWithGray.mdxc
+ovulePlusContex5SmoothPassesAllClosed3DTissuePureOvuleCleaned3DTissueSmoothed10times.mdxm
+ovulePlusContex5SmoothPassesAllClosed3DTissuePureOvuleCleaned3DTissueSmoothed10times_assignedGrowth.mdxm
+EM_C_188_cell220merged_3DtissueMorphogens.mdxm
+TestStuff.mdxm
+InitialSet.txt
+PrimarySet.txt
+SecondarySet.txt
+description.txt
+Makefile
+ignore:
+MorphoDynamX.py
+*.o
+*.so
+*
+Run:
+	gnome-terminal -x bash -c "make run"
+
+LabTable:
+	xdg-open .
+
+LabTableShell:
+	OBJSHELL
+
+DynamXHelp:
+	xdg-open /usr/local/share/doc/MorphoDynamX/html/index.html
+
+Files:
+	Model:
+		OBJED FemMembranes.cpp
+	Header:
+		OBJED FemMembranes.hpp
+	Parameters:
+		OBJED FemMembranes.mdxp
+	Description:
+		OBJED FemMembranes.txt
+	Specifications:
+		OBJED specifications
