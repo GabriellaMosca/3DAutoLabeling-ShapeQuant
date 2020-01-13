@@ -711,7 +711,7 @@ namespace mdx
         addParm("Cell volume from heatmap process name", "Compute cell volume from heatmap process, provide the process name", "Mesh/Heat Map/Measures3D/Geometry/Volume");
         addParm("Cell Volume Signal Attribute", "Cell Volume Signal Attribute as from Volume heatmap computation, Mesh/Heat Map/Measures3D/Geometry/Volume", "Volume");
         addParm("Visualize shape field process", "Visualize shape field", "Model/CCF/60 Shape Quantifier/04 Visualize Shape Field");
-        addParm("Write Periclinal wall ratio to a file for selected cells", "Writes periclinal wall ratio, top wall size, bottom wall size, general cell label, cell label, cell volume", "testShapeQuantifier.csv");
+        //addParm("Write Periclinal wall ratio to a file for selected cells", "Writes periclinal wall ratio, top wall size, bottom wall size, general cell label, cell label, cell volume", "testShapeQuantifier.csv");
 
       }
       //bool initialize(QWidget* parent);
