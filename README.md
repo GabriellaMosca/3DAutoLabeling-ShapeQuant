@@ -1,37 +1,29 @@
-## Welcome to GitHub Pages
+# 3DsemiAutoLabelingOvule
+Plugin for MorphoMechanX to classify in semi-automated way cell type in the ovule (L1 and pSMC/SMC  need to be selected) and to quantify principal axes of elongations in each cell
 
-You can use the [editor on GitHub](https://github.com/GabriellaMosca/3DsemiAutoLabelingOvule/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+To run this model on the test mesh provided, get MorphoMechanX first (release upon request, https://www.mpipz.mpg.de/MorphoGraphX/MorphoMechanX) and install it, this plugin works with git revision of MorphoMechanX e618301477af8a0bda2c344a7312195ba5acf379 and this info should be provided together with the software request). 
+After installing MorphoMechnX( in turn plugin of MorphoDynamX) this plugin won't need any further installation.
+Download the plugin from this git repository and put it into a folder.
+From a terminal move into the folder where the plugin is places and type:
+make run
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+A window will be opened showing already the 3D mesh with cell type classification active. 
+To test how cell classification works, select the wedge simbol from the left panel of the window (prolonged clicked of the left  mouse button will allow to select between triangle and wedge) and with that select manyally all the L1 cells in the area of interest. 
+The run: 
+Model/CCF/50 Set Cell Type 
+with the option "L1" selected.
+For the Ovule it is necessary to specify the pSMC/SMC manyally as well (to see inside use the Clippin Plane option), run again: 
+Model/CCF/50 Set Cell Type 
+with the option "pSMC" selected. 
 
-### Markdown
+After this select the region of ovule you are interested to for your analysis with the cube symbol on the left panel of the window (prolonged click of the mouse will allow to select between rectangle and cube - all shown with a diagonal)
+and run: 
+Model/CCF/60 Shape Quantifier/00 Global Shape Quantifier Process
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+This will process the cell and assigned them a type based on connectivity (L2/L3, Companion Cell, measure the principal elongation axes of the selected.
+The results can be reported in a csv file by running:
+Model/CCF/70 Write Shape Quantifiers (specify the file name in the filed on the right).
 
-```markdown
-Syntax highlighted code block
+A video tutorial will be provided soon
 
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/GabriellaMosca/3DsemiAutoLabelingOvule/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+ 
