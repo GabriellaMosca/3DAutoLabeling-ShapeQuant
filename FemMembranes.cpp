@@ -106,187 +106,7 @@ namespace mdx
   }
 
   
-  bool FemMembraneTrichomeProcess::initialize(QWidget *parent)
-  {
-    mesh = currentMesh();
-    if(!mesh)
-      throw(QString("FemMembranes::initialize No current mesh"));
-
-    ccName = mesh->ccName();
-    if(ccName.isEmpty())
-      throw(QString("FemMembranes::initialize No cell complex"));
-
-    cs = &mesh->ccStructure(ccName);
-
-    //double dt = femMembranes->parm("Dt");
-    newSources = false;
-    if(!getProcess(parm("FemMembranes Process name"), femMembranes))
-      throw(QString("Can not access FemMembranes main process, check the name passed"));
-
-    return true; 
-
-  }
-  bool FemMembraneTrichomeProcess::run()
-  {
-    /*Mesh *mesh = currentMesh();
-    if(!mesh)
-      throw(QString("FemMembraneSubdivide::run No current mesh"));
-    QString ccName = mesh->ccName();
-    if(ccName.isEmpty())
-      throw(QString("FemMembraneSubdivide::run Invalid cell complex"));
-    //get the cell complex
-    CCStructure &cs = mesh->ccStructure(ccName);
-    */
-    double distScale = 1000;
-
-    //get the indexAttribute
-    CCIndexDataAttr &indexAttr = mesh->indexAttr();
-    //get the distance Attributes
-    CCIndexDoubleAttr &hodgeAttr = mesh->attributes().attrMap<CCIndex,double>(parm("Hodge Attribute"));
-    CCIndexDoubleAttr initialAttr; //= mesh->attributes().attrMap<CCIndex,double>(parm("Initial sources"));
-    CCIndexDoubleAttr initialAttr2;// = mesh->attributes().attrMap<CCIndex,double>(parm("Secondary sources")); // map of the secondary sources for the secondary distance calculation (for secondary growth)
-    CCIndexDoubleAttr &distanceAttr = mesh->signalAttr<double>(parm("Distance field 1 Signal"));
-    CCIndexDoubleAttr &distanceAttr2 = mesh->signalAttr<double>(parm("Distance field 2 Signal"));
-
-    //if(!getProcess("FemMembranes Process name", femMembranes))
-    //  throw(QString("Can not access FemMembranes main process, check the name passed"));
-
-    //create the two sources set for the two diffusive processes
-    //clear any active selection
-    MeshClearSelection(*this).run(*cs, indexAttr); 
-    //load the primary Sources Set
-    MeshLoadSelection(*this).run(indexAttr, parm("Initial sources Set"));  
-    //initialize the sources
-    InitializeFromVertexSelection(*this).run(*cs, indexAttr, initialAttr);
-    
-    //do the same for the secondary sources set
-    MeshClearSelection(*this).run(*cs, indexAttr); 
-    //load the secondary Sources Set
-    MeshLoadSelection(*this).run(indexAttr, parm("Secondary sources Set"));  
-    //initialize the sources
-    InitializeFromVertexSelection(*this).run(*cs, indexAttr, initialAttr2);
-
-    //check if you have sources selected at all for the distance field
-    int numInitSources = 0;
-    int numSecondarySources = 0;
-    for(CCIndex vertex : cs->cellsOfDimension(0))
-    {
-       if ((initialAttr)[vertex] == 1)
-         numInitSources++;
-
-       if ((initialAttr2)[vertex] == 1)
-         numSecondarySources++;
-
-    }
-    if (numInitSources == 0){
-      mdxInfo << "!!!!!!!!!!!!!!!!No initial sources set for distance field is assigned, please select a source for the Distance Field to grow(under Diffusion/00 Initialize attribute from selected vertices)" << endl; 
-      return true;
-    }
-    if (numSecondarySources == 0){
-      mdxInfo << "!!!!!!!!!!!!!!!!No secondary sources set for distance field is set, please select a secondary source for the Distance Field to grow (under Diffusion/00 Initialize attribute from selected vertices) " << endl; 
-      return true;
-    }
-    Compute2DHodgeValues(*this).run(*cs,indexAttr,hodgeAttr);
- 
-    // run the primary distance field calculation, for primary (main growth)
-    DistanceField(*this).run(*cs,distScale,indexAttr,hodgeAttr,initialAttr,distanceAttr);
-   
-    //get the growth attribute  //that will be re-assigned -- this is faced-based
-    fem::GrowthAttr &growthAttr = mesh->attributes().attrMap<CCIndex, fem::Growth>(parm("Growth Attribute"));
-
-    //check if the growing tricome has reached the target distance from the base
-    //if that is the case, initialize 3 new sources
-    //double targetDistanceFromTip = parm("Distance ring-tip").toDouble();
-    double tardgeDistanceBoundaryFromTip = parm("Distance boundary-tip").toDouble();
-    //double toleranceRing = parm("Tolerance ring selection").toDouble();
-    double effectiveDistance = parm("Effective distance for growth").toDouble();
-    double secondaryEffectiveDistance = parm("Effective distance for Secondary Growth").toDouble();
-
-    double decayingSecondaryGrowth = parm("Decaying factor for distance Secondary Growth").toDouble();
-    //double angularDistanceNodes = parm("Angular distance").toDouble();
-    double scalingFactor = parm("Growth scaling factor").toDouble();
-    
-    //std::vector<CCIndex> ringNodes;
-    std::vector<CCIndex> sourceNodes;
-    double maxDistance =0;
-    //double converDeg2Rad = (angularDistanceNodes * 2. * M_PI)/360.;
-
-
-    //assign the primary growth field -- the main trichome growth
-    for (CCIndex faces : cs->cellsOfDimension(2))
-    {
-      fem::Growth &fG = growthAttr[faces];
-      double scaledGrowth;
-      //get the average face-distance (average from vertexes)
-      double faceDistance = 0;
-      for(CCIndex vertex : cs->incidentCells(faces,0))
-        faceDistance += (distanceAttr)[vertex];
-      faceDistance *= 1./cs->bounds(faces).size();
-      if (faceDistance <=  effectiveDistance) {
-	double x = faceDistance / effectiveDistance;
-	double x2 = x*x;
-	double val = 1 + x2 * (-(22./9.) + x2 * ((17./9.) + x2 * (-(4./9.))));
-	fG.kIso = scalingFactor * val;
-//        fG.kIso =scalingFactor * ( 1. - (4./9. * pow((faceDistance/effectiveDistance), 6.)) + (17./9. * pow((faceDistance/effectiveDistance), 4.)) - (22./9. * pow((faceDistance/effectiveDistance), 2.) ));
-      }
-      else
-        fG.kIso = 0.;
-     }
-    //look for new sources for secodnary growth, if the primary trichome has grown enough
-    /// I HAVE CHANGED THIS IDEA, NODES ARE SELECTED DIRECTLY ON THE MESH //define a ring of nodes, geometrical locus of points at the same distance from the initial source
-    if (!newSources){
-      for(CCIndex vertex : cs->cellsOfDimension(0))
-      {
-        double distance = (distanceAttr)[vertex];
-        if(distance > maxDistance)
-          maxDistance = distance;
-        //if(fabs(distance - targetDistanceFromTip) <= toleranceRing)
-        //  ringNodes.push_back(vertex); 
-       
-      }
-      mdxInfo << "maxDistance is : " << maxDistance << endl;
-      //if you reach the target distance, make the nodes of the ring at the chosen angular distance sources as well
-      if (maxDistance >= tardgeDistanceBoundaryFromTip)
-      {  
-        mdxInfo<< " I have reached maximal distance to initiate secondary growth" << endl;
-        // in the next step this will tell to recalculate the distance field
-        newSources = true;
-      }
-    }
-    // if newSources are present, 
-    //calculate the distance field for the secondary growth as the new sources have been defined
-    // and assign the secondary growth amount 
-    else
-    {
-      DistanceField(*this).run(*cs,distScale,indexAttr,hodgeAttr,initialAttr2,distanceAttr2);
-      // assign the secondary growth field
-      //first define the rescaled distance function
-      //double growthTime = 0.1;
-      double variableEffectiveDistance = secondaryEffectiveDistance * exp(-decayingSecondaryGrowth * femMembranes->growthTime);
-      //mdxInfo << "Variable effective distance seconday growth: " << variableEffectiveDistance << endl;
-      for (CCIndex faces : cs->cellsOfDimension(2))
-      {
-        fem::Growth &fG = growthAttr[faces];
-        //get the average face-distance (average from vertexes)
-        double faceDistance2 = 0;
-        for(CCIndex vertex : cs->incidentCells(faces,0))
-          faceDistance2 += (distanceAttr2)[vertex];
-        faceDistance2 *= 1./cs->bounds(faces).size();
-        //double variableEffectiveDistance = secondaryEffectiveDistance * exp(-decayingSecondaryGrowth * time)
-        if (faceDistance2 <= variableEffectiveDistance ) {
-	  double x = faceDistance2 / variableEffectiveDistance;
-	  double x2 = x*x;
-	  double val = 1 + x2 * (-(22./9.) + x2 * ((17./9.) + x2 * (-(4./9.))));
-	  fG.kIso += scalingFactor * val;
-        }
-      }
-    } 
-    mesh->updatePositions(ccName);
-
-    return true;
-  };
-
-  bool FemMembraneBisect::run()
+    bool FemMembraneBisect::run()
   {
     Mesh *mesh = currentMesh();
     if(!mesh)
@@ -566,7 +386,7 @@ namespace mdx
     }
 
     if (L1Cells.size() == 0 /*or L1DomeCells.size() == 0*/)
-      throw(QString("60 Shape Quantifier/03 Compute L2 periclinal surface ratio::run no L1  cells selected. Plese run the process: 50 Set Cell Type and assign L1 cells"));
+      throw(QString("60 Shape Quantifier/03 Compute Connectivity and L2 periclinal surface ratio::run no L1  cells selected. Plese run the process: 50 Set Cell Type and assign L1 cells"));
     
     //assign from L1 and L1 Dome neighborhood relation, L2 cells (only if they belong to the selected area).
     //also assign the L2 attribute to those cells
@@ -774,6 +594,8 @@ namespace mdx
        throw(QString("ComputeCellShapeQuantifier::initialize Cannot make :" + parm("Visualize shape field process")));
      if(!getProcess(parm("Cell volume from heatmap process name"), measureVolumeProcess))
        throw(QString("ComputeCellShapeQuantifier::initialize Cannot make :" + parm("Cell volume from heatmap process name")));
+      if(!getProcess(parm("Write data to file process name"), writeCellShapeQuantifiers))
+       throw(QString("ComputeCellShapeQuantifier::initialize Cannot make :" + parm("Write data to file process name")));
 
       
      mesh = currentMesh();
@@ -790,6 +612,7 @@ namespace mdx
      L2PericlinalSurfRatioProcess->run();
      visualizeCellShapeProcess->run();
      measureVolumeProcess->run(*mesh, cs, *indexAttr, *volumeHeatAttr);
+     writeCellShapeQuantifiers->run();
      return true;
   }
 
@@ -844,7 +667,6 @@ namespace mdx
  
   REGISTER_PROCESS(FemMembraneSetGrowth);
   REGISTER_PROCESS(FemMembraneCellFacesGrowth);
-  REGISTER_PROCESS(FemMembraneTrichomeProcess);
   REGISTER_PROCESS(FemMembraneSetDirichlet);
   REGISTER_PROCESS(FemMembraneDirichletDerivs);
   REGISTER_PROCESS(FemMembraneGrowth);

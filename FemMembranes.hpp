@@ -27,6 +27,7 @@ namespace mdx
   class SkewSymmetricTensor;
   class AntiSymmetryTensor;
   class VisualizeShapeQuantifiers;
+  class WriteCellShapeQuantifier;
 
   // Main model class
   class FemMembranes : public Process
@@ -256,53 +257,7 @@ namespace mdx
       }
   };
 
-  //specific trichome growth assignation process
-  class FemMembraneTrichomeProcess : public Process
-  {
-    public:
-      FemMembraneTrichomeProcess(const Process &process) : Process(process) 
-      {
-        setName("Set Trichome Growth");
-        setName("Model/CCF/14 Set Trichome Growth");
-
-        setDesc("Set Growth attributes specific for trichome growth. Ovverrides growthIso attributed from previous processes");
-  
-        addParm("Initial sources Set","Saved set containing tip vertices","InitialSet.txt");
-        addParm("Secondary sources Set", "Saved set containing secondary tip vertices", "SecondarySet.txt");
-	//addParm("Distance ring-tip", "Distance between the tricome tip and the ring of secondary growth", "20.");
-        addParm("Distance boundary-tip", "Distance between the tricome tip and the boundary to be reached before initiationg secondary growth", "40");
-        //addParm("Tolerance ring selection", "Tolerance to accept a node into the ring and as a source", "1");
-        addParm("Effective distance for growth", "Scaling factor for distance based-growth field", "10.");
-        addParm("Effective distance for Secondary Growth", "Effective distance for growth after branching", "5");
-        addParm("Decaying factor for distance Secondary Growth", "Decaying factor for the range of action of secondary growth as: EffDistSecondary * e^(-t * Decaying)", "1");
-        //addParm("Angular distance", "Angular distance for secondary sources selection (DEG)", "120.");
-        addParm("Growth scaling factor", "Global growth rescaling factor", "0.01");
-        addParm("FemMembranes Process name", "Name of the main FemMembranes process", "Model/CCF/01 FEM Membranes");
-       	addParm("Hodge Attribute",
-                "Name of double-valued attribute containing computed Hodge values","Hodge Values");
-        addParm("Growth Attribute", "Name of the attribute that holds Growth", "Fem Growth");
-        addParm("Distance field 1 Signal", "Name of the signal to visualize distance signal primary sources", "Distance Primary");
-        addParm("Distance field 2 Signal", "Name of the signal to visualize distance signal secondary sources", "Distance Secondary");
-
-
-
-      }
-
-      /// Set the reference configuration for selected elements
-      bool initialize(QWidget *parent);
-      bool run();
-
-      FemMembranes *femMembranes = 0;
-
-      private:
-       Mesh *mesh = 0;
-       QString ccName;
-       CCStructure *cs = 0;
-       //FemMembranes *femMembranes = 0;
-
-       bool newSources = false;
-  };
-  class FemMembraneSetDirichlet : public fem::SetDirichlet
+   class FemMembraneSetDirichlet : public fem::SetDirichlet
   {
   public:
     FemMembraneSetDirichlet(const Process &proc) : SetDirichlet(proc) 
@@ -681,7 +636,7 @@ namespace mdx
       AssignCellTypeForShapeQuantifier (const Process &process) : Process(process) 
       {
         setName("Model/CCF/50 Set Cell Type");
-        setDesc("Assign cell type for shape quantifiers (L1 dome and L1 cells).");
+        setDesc("Assign cell type for shape and connectivity quantifiers (L1 dome and L1 cells).");
         setIcon(QIcon(":/images/CellType.png"));
 
         addParm("Assign cell type for selected cells", "Assign cell type for selected cells, L1 and L1 Dome are required for shape quantification", "L1", QStringList()<< "L1" << "L2" << "pSMC" << "CC");
@@ -701,17 +656,17 @@ namespace mdx
     public:
       ComputeCellShapeQuantifier(const Process &process) : Process(process) 
       {
-        setName("Model/CCF/60 Shape Quantifier/00 Global Shape Quantifier Process");
-        setDesc("Compute cell shape anisotropy and antisymmetry.");
+        setName("Model/CCF/60 Shape and Connectivity Quantifiers/00 Global Shape and Connectivity Quantifier Process");
+        setDesc("Compute cell shape anisotropy, volume, cell layers and L2/L3 surface ratio.");
         setIcon(QIcon(":/images/CellType.png"));
 
-        addParm("Compute Skew Symmetric tensor process", "Compute Skew Symmetric tensor process", "Model/CCF/60 Shape Quantifier/01 Compute Skew Symmetric Tensor");
-        addParm("Compute Antisymmetry tensor process", "Compute Antisymmetry tensor process", "Model/CCF/60 Shape Quantifier/02 Compute Antisymmetry Tensor");
-        addParm("Compute periclinal wall surface ratio for L2 cells", "For each L2 cell, computes the ratio of surface area shared with top L1 cells and the surface area shared with L3 layer",  "Model/CCF/60 Shape Quantifier/03 Compute L2 periclinal surface ratio for selected ovule zone");
+        addParm("Compute Skew Symmetric tensor process", "Compute Skew Symmetric tensor process", "Model/CCF/60 Shape and Connectivity Quantifiers/01 Compute Skew Symmetric Tensor");
+        addParm("Compute Antisymmetry tensor process", "Compute Antisymmetry tensor process", "Model/CCF/60 Shape and Connectivity Quantifiers/02 Compute Antisymmetry Tensor");
+        addParm("Compute layers and periclinal wall surface ratio for L2 cells", "For each L2 cell, computes the ratio of surface area shared with top L1 cells and the surface area shared with L3 layer",  "Model/CCF/60 Shape and Connectivity Quantifiers/03 Compute Cell Layers and L2-L3 Surface ratio");
         addParm("Cell volume from heatmap process name", "Compute cell volume from heatmap process, provide the process name", "Mesh/Heat Map/Measures3D/Geometry/Volume");
         addParm("Cell Volume Signal Attribute", "Cell Volume Signal Attribute as from Volume heatmap computation, Mesh/Heat Map/Measures3D/Geometry/Volume", "Volume");
-        addParm("Visualize shape field process", "Visualize shape field", "Model/CCF/60 Shape Quantifier/04 Visualize Shape Field");
-        //addParm("Write Periclinal wall ratio to a file for selected cells", "Writes periclinal wall ratio, top wall size, bottom wall size, general cell label, cell label, cell volume", "testShapeQuantifier.csv");
+        addParm("Visualize shape field process", "Visualize shape field", "Model/CCF/60 Shape and Connectivity Quantifiers/04 Visualize Shape Field");
+        addParm("Write data to file process name", "Writes data computed to a file", "Model/CCF/60 Shape and Connectivity Quantifiers/05 Write Shape and Connectivity Quantifiers");
 
       }
       //bool initialize(QWidget* parent);
@@ -730,6 +685,7 @@ namespace mdx
       L2PericlinalSurfRatio *L2PericlinalSurfRatioProcess = 0;
       VisualizeShapeQuantifiers *visualizeCellShapeProcess = 0;
       MeasureVolume *measureVolumeProcess = 0; 
+      WriteCellShapeQuantifier *writeCellShapeQuantifiers = 0;
     private:
 
   };
@@ -739,7 +695,7 @@ namespace mdx
     public:
       SkewSymmetricTensor(const Process &process) : Process(process) 
       {
-        setName("Model/CCF/60 Shape Quantifier/01 Compute Skew Symmetric Tensor");
+        setName("Model/CCF/60 Shape and Connectivity Quantifiers/01 Compute Skew Symmetric Tensor");
 
         setDesc("Compute cell shape anisotropy.");
         setIcon(QIcon(":/images/CellType.png"));
@@ -770,7 +726,7 @@ namespace mdx
     public:
       AntiSymmetryTensor(const Process &process) : Process(process) 
       {
-        setName("Model/CCF/60 Shape Quantifier/02 Compute Antisymmetry Tensor");
+        setName("Model/CCF/60 Shape and Connectivity Quantifiers/02 Compute Antisymmetry Tensor");
 
         setDesc("Compute cell shape anisotropy.");
         setIcon(QIcon(":/images/CellType.png"));
@@ -795,8 +751,8 @@ namespace mdx
     public:
       L2PericlinalSurfRatio(const Process &process) : Process(process) 
       {
-        setName("Model/CCF/60 Shape Quantifier/03 Compute L2 periclinal surface ratio for selected ovule zone");
-        setDesc("For each L2 cell, computes the ratio of surface area shared with L1 cells and the surface area shared with L3 layer");
+        setName("Model/CCF/60 Shape and Connectivity Quantifiers/03 Compute Cell Layers and L2-L3 Surface ratio");
+        setDesc("Given L1 ,computes L2,L3 layers and for each L2 cell, computes the ratio of surface area shared with L1 cells and the surface area shared with L3 layer");
        
         addParm("Cutoff value for spurious contact", "Set lower cutoff value to filter out spurious contacts as just edge contact or point contact", "1.");
         addParm("Shape Attribute Name", "Shape Attribute Name", "CellShapeData");
@@ -814,7 +770,6 @@ namespace mdx
       double spuriousContactCutoff;
       //AuxinGradient::CellDataAttr *cellAttr = 0;
       //AuxinGradient::EdgeDataAttr *edgeAttr = 0;
-
     private:
 
   };
@@ -826,7 +781,7 @@ namespace mdx
 
     VisualizeShapeQuantifiers(const Process &process) : Process(process) 
     {
-      setName("Model/CCF/60 Shape Quantifier/04 Visualize Shape Field");
+      setName("Model/CCF/60 Shape and Connectivity Quantifiers/04 Visualize Shape Field");
       setDesc("Draw shape fields and anisotropy vectors.");
       setIcon(QIcon(":/images/Default.png"));
 
@@ -859,7 +814,7 @@ namespace mdx
     public:
       WriteCellShapeQuantifier(const Process &process) : Process(process) 
       {
-        setName("Model/CCF/70 Write Shape Quantifier");
+        setName("Model/CCF/60 Shape and Connectivity Quantifiers/05 Write Shape and Connectivity Quantifiers");
         setDesc("Write periclinal wall ratio, bottom wall surface, top wall surface, cell volume, for selected L2 cells with their labeling and cell typ (L2 or pSMC) ");
         setIcon(QIcon(":/images/CellType.png"));
 
