@@ -3,149 +3,6 @@
 namespace mdx
 {
 
-  bool FemMembranes::initialize(QWidget *parent)
-  {
-    mesh = currentMesh();
-    if(!mesh)
-      throw(QString("FemMembranes::initialize No current mesh"));
-
-    ccName = mesh->ccName();
-    if(ccName.isEmpty())
-      throw(QString("FemMembranes::initialize No cell complex"));
-
-    cs = &mesh->ccStructure(ccName);
-
-    // Get the solver process
-    if(!getProcess(parm("Solver Process"), solverProcess))
-      throw(QString("FemMembranes::initialize Unable to make solver process: %1").arg(parm("Solver Process")));
-    solverProcess->initialize(parent);
-    //get the trichome process
-    // if(!getProcess(parm("Trichome Process"), trichomeProcess))
-    //  throw(QString("FemMembranes::initialize Unable to make trichome process: %1").arg(parm("Trichome Process")));
-    //trichomeProcess->initialize(parent); 
-
-    // Get the growth process
-    if(!getProcess(parm("Growth Process"), growthProcess))
-      throw(QString("FemMembranes::initialize Unable to make growth process: %1").arg(parm("Growth Process")));
-    growthProcess->initialize(parent);
-
-    // Get the subdivide process
-    if(!getProcess(parm("Subdivide Process"), subdivideProcess))
-      throw(QString("FemMembranes::initialize Unable to make subdivide process: %1").arg(parm("Subdivide Process")));
-    subdivideProcess->initialize(parent);
-
-    return true;
-  }
-
-  bool FemMembranes::step()
-  {
-    if(!solverProcess)
-      throw(QString("FemMembranes::run Solver process pointer invalid"));
-    if(!growthProcess)
-      throw(QString("FemMembranes::run Growth process pointer invalid"));
-    if(!subdivideProcess)
-      throw(QString("FemMembranes::run Subdivide process pointer invalid"));
-
-    // If converged subdivide then grow
-    if(!solverProcess->step()) {
-
-      //take a screenshot
-      static int screenShotCount = 0;
-      QString fileName = QString("OvuleFEMGrowth-%1.JPG").arg(screenShotCount++, 4, 10, QChar('0'));
-      takeSnapshot(fileName);
- 
-
-      // assigned the trichome growth data    
-      //if(!getProcess(parm("Trichome Process"), trichomeProcess))
-      //  throw(QString("FemMembranes::run Unable to make trichome process: %1").arg(parm("Trichome Process")));
-      //trichomeProcess->run();
-      growthProcess->run();
-      double growthDt = growthProcess->parm("Growth Dt").toDouble();
-      growthTime += growthDt;
-      if(stringToBool(solverProcess->parm("Print Stats")))
-        mdxInfo << QString("Growth Step Time %1, step %2").arg(growthTime).arg(growthDt) << endl;
-
-      // If we subdivide, we need to re-initialize the solver
-      if(subdivideProcess->run()) {
-        mesh->updateAll(ccName);
-        // Reinitialize solver with new graph
-        solverProcess->initSolver(cs);
-      }
-    }
-    mesh->updatePositions(ccName);
-
-    return true;
-  }
-
-  bool FemMembranes::rewind(QWidget *parent)
-  {
-    // To rewind, we'll reload the mesh
-    Mesh *mesh = currentMesh();
-    if(!mesh or mesh->file().isEmpty())
-      throw(QString("No current mesh, cannot rewind"));
-    MeshLoad meshLoad(*this);
-    meshLoad.setParm("File Name", mesh->file());
-    growthTime = 0;
-    return meshLoad.run();
-  }
-
-  bool FemMembranes::finalize(QWidget *parent)
-  {
-    if(!solverProcess)
-      throw(QString("FemMembranes::run Solver process pointer invalid"));
-
-    bool result = solverProcess->finalize(parent);
-
-    // Cleanup
-    mesh = 0;
-    solverProcess = 0;
-    growthProcess = 0;
-    subdivideProcess = 0;
-
-    return result;
-  }
-
-  
-    bool FemMembraneBisect::run()
-  {
-    Mesh *mesh = currentMesh();
-    if(!mesh)
-      throw(QString("FemMembraneSubdivide::run No current mesh"));
-    QString ccName = mesh->ccName();
-    if(ccName.isEmpty())
-      throw(QString("FemMembraneSubdivide::run Invalid cell complex"));
-
-    fem::ElasticTriangle3Attr &elementAttr = mesh->attributes().attrMap<CCIndex, fem::ElasticTriangle3>(parm("Element Attribute"));
-    fem::TransIsoMaterialAttr &materialAttr = mesh->attributes().attrMap<CCIndex, fem::TransIsoMaterial>(parm("Material Attribute"));
-    fem::PressureAttr &pressureAttr = mesh->attributes().attrMap<CCIndex, fem::Pressure>(parm("Pressure Attribute"));
-    fem::PressureEdgeAttr &pressureEdgeAttr = mesh->attributes().attrMap<CCIndex, fem::PressureEdge>(parm("Pressure Edge Attribute"));
- 
-    fem::GrowthAttr &growthAttr = mesh->attributes().attrMap<CCIndex, fem::Growth>(parm("Growth Attribute"));
-    fem::DirichletAttr &dirichletAttr = mesh->attributes().attrMap<CCIndex, fem::Dirichlet>(parm("Dirichlet Attribute"));
-
-    fem::Triangle3Attr<Point1d> &elementMorphoAnisoAttr = mesh->attributes().attrMap<CCIndex, fem::Triangle3<Point1d>>(parm("Morphogen Anisotropy Element Attribute"));
-    fem::Triangle3Attr<Point1d> &elementMorphoGrowthAttr = mesh->attributes().attrMap<CCIndex, fem::Triangle3<Point1d>>(parm("Morphogen Growth Element Attribute"));
-    
-    fem::MorphogenDataAttr &morphogenE2DataAttr = mesh->attributes().attrMap<CCIndex, fem::MorphogenData>(parm("Morphogen Anisotropy E2 Data"));
-    fem::MorphogenDataAttr &morphogenKParDataAttr = mesh->attributes().attrMap<CCIndex, fem::MorphogenData>(parm("Morphogen Anisotropy KPar Data"));
-    fem::MorphogenDataAttr &morphogenGrowth1DataAttr = mesh->attributes().attrMap<CCIndex, fem::MorphogenData>(parm("Morphogen Growth Data 1"));
-    fem::MorphogenDataAttr &morphogenGrowth2DataAttr = mesh->attributes().attrMap<CCIndex, fem::MorphogenData>(parm("Morphogen Growth Data 2"));
-     
-    fem::MorphogenDirichletAttr &moprhogenDirichletE2Attr = mesh->attributes().attrMap<CCIndex, fem::MorphogenDirichlet>(parm("Morphogen Anisotropy E2 Dirichlet"));
-    fem::MorphogenDirichletAttr &moprhogenDirichletKParAttr = mesh->attributes().attrMap<CCIndex, fem::MorphogenDirichlet>(parm("Morphogen Anisotropy KPar Dirichlet"));
-    fem::MorphogenDirichletAttr &moprhogenDirichletGrowth1Attr = mesh->attributes().attrMap<CCIndex, fem::MorphogenDirichlet>(parm("Morphogen Growth Dirichlet 1"));
-    fem::MorphogenDirichletAttr &moprhogenDirichletGrowth2Attr = mesh->attributes().attrMap<CCIndex, fem::MorphogenDirichlet>(parm("Morphogen Growth Dirichlet 2"));
-
-
-    FemMembraneSubdivide sDiv(*mesh, elementAttr, elementMorphoAnisoAttr, elementMorphoGrowthAttr, materialAttr, pressureAttr, pressureEdgeAttr, dirichletAttr, growthAttr, morphogenE2DataAttr, morphogenKParDataAttr, 
-                           morphogenGrowth1DataAttr, morphogenGrowth2DataAttr, moprhogenDirichletE2Attr, moprhogenDirichletKParAttr, moprhogenDirichletGrowth1Attr, moprhogenDirichletGrowth2Attr);
-    mesh->updateAll(ccName);
-
-    return run(*mesh, mesh->ccStructure(ccName), parm("Max Area").toDouble(), &sDiv);
-  }
-
-
-
   ////////////////////////////////////////////////////////
   bool AssignCellTypeForShapeQuantifier::run()
   {
@@ -185,12 +42,6 @@ namespace mdx
     CCStructure &cs = mesh->ccStructure(SourceCC);
     indexAttr = &mesh->indexAttr();
     shapeAttr = &mesh->attributes().attrMap<CCIndex,CellShapeData >(parm("Shape Attribute Name"));
-    //if(!getProcess(parm("Tissue Process"), tissueProcess))
-    //  throw(QString("AuxinSolver::initialize Cannot make Tissue Process:" + parm("Tissue Process")));
-    //tissueProcess->initialize(parent); 
-  
-    //get the barycenter, weighted on the average edge lengths for edges shared by the vtx 
-    //now it is a mesh so weights are not so important...but let's use them 
     for(CCIndex c : cs.volumes()) {
       Point3d barycenter = Point3d(0., 0., 0.);
       double weightSum = 0.;
@@ -219,9 +70,7 @@ namespace mdx
       double yz = 0;
       double zz = 0;
       for (uint i=0; i<midPointVec2AvArea.size(); i++){
-      //for(CCIndex v : cs.incidentCells(c,0)){
         xx += midPointVec2AvArea[i].second *  pow(midPointVec2AvArea[i].first.x() - barycenter.x(), 2);
-
         xy += midPointVec2AvArea[i].second * (midPointVec2AvArea[i].first.x() - barycenter.x())*(midPointVec2AvArea[i].first.y() - barycenter.y());
         xz += midPointVec2AvArea[i].second * (midPointVec2AvArea[i].first.x() - barycenter.x())*(midPointVec2AvArea[i].first.z() - barycenter.z());
         yy += midPointVec2AvArea[i].second * pow(midPointVec2AvArea[i].first.y() - barycenter.y(), 2);
@@ -252,11 +101,10 @@ namespace mdx
       Point3d eigVal;
       eigenDecompSym3x3(averagePosPos, eigVect, eigVal);
       // the eigenvectors are already given as column vectors
-      (*shapeAttr)[c].skewSymmetricTensor =  eigVect;
+      (*shapeAttr)[c].skewSymmetricTensor =  transpose(eigVect);
       (*shapeAttr)[c].skewSymmetricTensor[0][2] = eigVal[0];
       (*shapeAttr)[c].skewSymmetricTensor[1][2] = eigVal[1];
       (*shapeAttr)[c].skewSymmetricTensor[2][2] = eigVal[2];
-      //(*shapeAttr)[c].skewSymmetricTensor = transpose((*shapeAttr)[c].skewSymmetricTensor);
         
       }
     return 0;
@@ -277,9 +125,6 @@ namespace mdx
     CCStructure &cs = mesh->ccStructure(SourceCC);
     indexAttr = &mesh->indexAttr();
     shapeAttr = &mesh->attributes().attrMap<CCIndex,CellShapeData >(parm("Shape Attribute Name"));
-    //if(!getProcess(parm("Tissue Process"), tissueProcess))
-    //  throw(QString("AuxinSolver::initialize Cannot make Tissue Process:" + parm("Tissue Process")));
-    //tissueProcess->initialize(parent); 
   
     //get the barycenter, weighted on the average edge lengths for edges shared by the vtx 
     //now it is a mesh so weights are not so important...but let's use them 
@@ -367,9 +212,6 @@ namespace mdx
     spuriousContactCutoff = parm("Cutoff value for spurious contact").toDouble();
     
     mesh->updateAll(SourceCC);
-    //int numL1Dome = 0;
-    //int numL1 = 0;
-
     //create a vector of L1 and L1 Dome cells
     // and a vector of L2 cells, to save computational time
     std::vector <CCIndex> L1Cells;
@@ -377,26 +219,16 @@ namespace mdx
     std::vector <CCIndex> L2Cells;
 
     for(CCIndex c : cs.cellsOfDimension(3)){
-    //   if((*shapeAttr)[c].cellType == L1Dome)
-    //     L1DomeCells.push_back(c);
        if((*shapeAttr)[c].cellType == 1)
          L1Cells.push_back(c);
-         //mdxInfo<< " I am pushing back an L1cell"<< endl;
   
     }
 
     if (L1Cells.size() == 0 /*or L1DomeCells.size() == 0*/)
-      throw(QString("60 Shape Quantifier/03 Compute Connectivity and L2 periclinal surface ratio::run no L1  cells selected. Plese run the process: 50 Set Cell Type and assign L1 cells"));
+      throw(QString("60 Shape Quantifier/03 Compute L2 periclinal surface ratio::run no L1  cells selected. Plese run the process: 50 Set Cell Type and assign L1 cells"));
     
     //assign from L1 and L1 Dome neighborhood relation, L2 cells (only if they belong to the selected area).
     //also assign the L2 attribute to those cells
-    //for(uint i=0; i<L1DomeCells.size(); i++){
-    //  for(CCIndex c: cs.neighbors(L1DomeCells[i]))
-    //  {
-    //    if((*shapeAttr)[c].cellType != L1 and (*shapeAttr)[c].cellType != L1Dome)
-    //      L2Cells.push_back(c);
-    //  }
-    //}
     std::vector <CCIndex> sporeMC;
     for(uint i=0; i<L1Cells.size(); i++){
       for(CCIndex c: cs.neighbors(L1Cells[i]))
@@ -423,8 +255,6 @@ namespace mdx
      double sharedBottomWallArea = 0;
      for(CCIndex nL2: cs.neighbors(L2Cells[i]))
      {
-         //if(cs.adjacent(L2Cells[i],L1Cells[j]))
-         //{
          if((*shapeAttr)[nL2].cellType == L1){
            for(CCIndex f: cs.incidentCells(L2Cells[i],2))
            {
@@ -490,6 +320,7 @@ namespace mdx
     CCIndexDoubleAttr &minAsymmetryAttr = mesh->signalAttr<double>("CellMinAsymmetrySignal");  
     CCIndexDoubleAttr &L2PericlinalRatioAttr = mesh->signalAttr<double>("L2PericlinalRation"); 
     CCIndexDoubleAttr &CellTypeAttr = mesh->signalAttr<double>("CellTypeAttr");      
+    
     out = CCStructure(2);
     forall(CCIndex f, src.cellsOfDimension(3)) {
        //as a scalar I plot the max Dimension/ mid Dimension
@@ -505,62 +336,73 @@ namespace mdx
        out.addCell(f);
        // Add the vertices
        CCIndex v1 = CCIndexFactory.getIndex();
-       out.addCell(v1);
+       //out.addCell(v1);
        CCIndex v2 = CCIndexFactory.getIndex();
-       out.addCell(v2);
+       //out.addCell(v2);
 
-       //CCIndex v3 = CCIndexFactory.getIndex();
-       ///out.addCell(v3);
-       //CCIndex v4 = CCIndexFactory.getIndex();
+       CCIndex v3 = CCIndexFactory.getIndex();
+       //out.addCell(v3);
+       CCIndex v4 = CCIndexFactory.getIndex();
        //out.addCell(v4);
 
-       //CCIndex v5 = CCIndexFactory.getIndex();
+       CCIndex v5 = CCIndexFactory.getIndex();
        //out.addCell(v5);
-       //CCIndex v6 = CCIndexFactory.getIndex();
+       CCIndex v6 = CCIndexFactory.getIndex();
        //out.addCell(v6);
 
        // I plot only the max and mid anisotropy axis
 
        CCIndexData V1 = (*indexAttr)[v1];
        CCIndexData V2 = (*indexAttr)[v2];
-       //CCIndexData V3 = (*indexAttr)[v3];
-       //CCIndexData V4 = (*indexAttr)[v4];
-       //CCIndexData V5 = (*indexAttr)[v5];
-       //CCIndexData V6 = (*indexAttr)[v6];
+       CCIndexData V3 = (*indexAttr)[v3];
+       CCIndexData V4 = (*indexAttr)[v4];
+       CCIndexData V5 = (*indexAttr)[v5];
+       CCIndexData V6 = (*indexAttr)[v6];
 
        Matrix3d transposeSkewSymm = transpose((*shapeAttr)[f].skewSymmetricTensor);
 
-       V1.pos = V.pos - (0.5 * transposeSkewSymm[0] * AnisotropyVecSize);// * transposeSkewSymm[2][0]);///(transposeSkewSymm[2][0] + transposeSkewSymm[2][1] + transposeSkewSymm[2][2]));
-       V2.pos = V.pos + (0.5 * transposeSkewSymm[0] * AnisotropyVecSize);// * transposeSkewSymm[2][0]);///(transposeSkewSymm[2][0] + transposeSkewSymm[2][1] + transposeSkewSymm[2][2]));
+       V1.pos = V.pos - (0.5 * transposeSkewSymm[0] * AnisotropyVecSize * transposeSkewSymm[2][0]/(transposeSkewSymm[2][0]  + transposeSkewSymm[2][1] + transposeSkewSymm[2][2]));
+       V2.pos = V.pos + (0.5 * transposeSkewSymm[0] * AnisotropyVecSize * transposeSkewSymm[2][0]/(transposeSkewSymm[2][0]  + transposeSkewSymm[2][1] + transposeSkewSymm[2][2]));
           
-       //V3.pos = V.pos - (0.5 * transposeSkewSymm[1] * AnisotropyVecSize * transposeSkewSymm[2][1]/(transposeSkewSymm[2][0] + transposeSkewSymm[2][1] + transposeSkewSymm[2][2]));
-       //V4.pos = V.pos + (0.5 * transposeSkewSymm[1] * AnisotropyVecSize * transposeSkewSymm[2][1]/(transposeSkewSymm[2][0] + transposeSkewSymm[2][1] + transposeSkewSymm[2][2]));
+       V3.pos = V.pos - (0.5 * transposeSkewSymm[1] * AnisotropyVecSize * transposeSkewSymm[2][1]/(transposeSkewSymm[2][0] + transposeSkewSymm[2][1] + transposeSkewSymm[2][2]));
+       V4.pos = V.pos + (0.5 * transposeSkewSymm[1] * AnisotropyVecSize * transposeSkewSymm[2][1]/(transposeSkewSymm[2][0] + transposeSkewSymm[2][1] + transposeSkewSymm[2][2]));
 
     
-       //Point3d minAnisoAxis = transposeSkewSymm[0]^transposeSkewSymm[1];
-       //V5.pos = V.pos - (0.5 * minAnisoAxis * AnisotropyVecSize * transposeSkewSymm[2][2]/(transposeSkewSymm[2][0] + transposeSkewSymm[2][1] + transposeSkewSymm[2][2]));
-       //V6.pos = V.pos + (0.5 * minAnisoAxis * AnisotropyVecSize * transposeSkewSymm[2][2]/(transposeSkewSymm[2][0] + transposeSkewSymm[2][1] + transposeSkewSymm[2][2]));
+       Point3d minAnisoAxis = transposeSkewSymm[0]^transposeSkewSymm[1];
+       V5.pos = V.pos - (0.5 * minAnisoAxis * AnisotropyVecSize * transposeSkewSymm[2][2]/(transposeSkewSymm[2][0] + transposeSkewSymm[2][1] + transposeSkewSymm[2][2]));
+       V6.pos = V.pos + (0.5 * minAnisoAxis * AnisotropyVecSize * transposeSkewSymm[2][2]/(transposeSkewSymm[2][0] + transposeSkewSymm[2][1] + transposeSkewSymm[2][2]));
        
 
        (*indexAttr)[v1] = V1;
        (*indexAttr)[v2] = V2;
-       //(*indexAttr)[v3] = V3;
-       //(*indexAttr)[v4] = V4;
-       //(*indexAttr)[v5] = V5;
-       //(*indexAttr)[v6] = V6;
+       (*indexAttr)[v3] = V3;
+       (*indexAttr)[v4] = V4;
+       (*indexAttr)[v5] = V5;
+       (*indexAttr)[v6] = V6;
 
        //double minAxisNorm = norm(V4.pos - V3.pos);
        //mdxInfo << "minAnisoNorm " << minAxisNorm << endl;
        // Add the edge
+
        CCIndex e = CCIndexFactory.getIndex();
-       out.addCell(e, +v1 -v2);
+       CCIndex e2 = CCIndexFactory.getIndex();
+       CCIndex e3 = CCIndexFactory.getIndex();
 
-       //CCIndex e2 = CCIndexFactory.getIndex();
-       //out.addCell(e2, +v3 -v4);
-
-       //CCIndex e3 = CCIndexFactory.getIndex();
-       //out.addCell(e3, +v5 -v6);
-
+       if(parm("Visualize Max Anisotropy Vector") == "True"){
+         out.addCell(v1);
+         out.addCell(v2);
+         out.addCell(e, +v1 -v2);
+       }
+       if(parm("Visualize Mid Anisotropy Vector") == "True"){
+         out.addCell(v3);
+         out.addCell(v4);
+         out.addCell(e2, +v3 -v4);
+       }
+       if(parm("Visualize Min Anisotropy Vector") == "True"){
+         out.addCell(v5);
+         out.addCell(v6);
+         out.addCell(e3, +v5 -v6);
+       }
     }
     mesh->drawParms(OutputCC).setGroupVisible("Vertices", true);
     mesh->drawParms(OutputCC).setGroupVisible("Edges", true);
@@ -594,8 +436,6 @@ namespace mdx
        throw(QString("ComputeCellShapeQuantifier::initialize Cannot make :" + parm("Visualize shape field process")));
      if(!getProcess(parm("Cell volume from heatmap process name"), measureVolumeProcess))
        throw(QString("ComputeCellShapeQuantifier::initialize Cannot make :" + parm("Cell volume from heatmap process name")));
-      if(!getProcess(parm("Write data to file process name"), writeCellShapeQuantifiers))
-       throw(QString("ComputeCellShapeQuantifier::initialize Cannot make :" + parm("Write data to file process name")));
 
       
      mesh = currentMesh();
@@ -612,7 +452,6 @@ namespace mdx
      L2PericlinalSurfRatioProcess->run();
      visualizeCellShapeProcess->run();
      measureVolumeProcess->run(*mesh, cs, *indexAttr, *volumeHeatAttr);
-     writeCellShapeQuantifiers->run();
      return true;
   }
 
@@ -651,48 +490,6 @@ namespace mdx
     setStatus(QString("Shape analysis CSV file written" ));
   }	  
 
-  REGISTER_PROCESS(FemMembranes);
-  REGISTER_PROCESS(FemMembraneSolver);
-  REGISTER_PROCESS(FemMembraneRefCfg);
-  REGISTER_PROCESS(FemMembraneStressStrain);
-  REGISTER_PROCESS(FemMembraneDerivs);
-  REGISTER_PROCESS(FemMembraneMaterial);
-  REGISTER_PROCESS(FemMembraneCellFacesMaterial);
-  REGISTER_PROCESS(FemMembraneAnisoDir);
-  REGISTER_PROCESS(FemMembraneAnisoDirMorphogens);
-  REGISTER_PROCESS(FemMembranePressure);
-  REGISTER_PROCESS(FemMembranePressureDerivs);
-  REGISTER_PROCESS(FemMembraneEdgePressure);
-  REGISTER_PROCESS(FemMembranePressureEdgeDerivs);
- 
-  REGISTER_PROCESS(FemMembraneSetGrowth);
-  REGISTER_PROCESS(FemMembraneCellFacesGrowth);
-  REGISTER_PROCESS(FemMembraneSetDirichlet);
-  REGISTER_PROCESS(FemMembraneDirichletDerivs);
-  REGISTER_PROCESS(FemMembraneGrowth);
-  REGISTER_PROCESS(FemMembraneSetGrowthMorphogens);
-
-  REGISTER_PROCESS(FemMembraneBisect);
-  REGISTER_PROCESS(FemMembraneDiffusionAnisotropyDerivs);
-  REGISTER_PROCESS(FemMembraneDiffusionAnisotropyDirichletDerivs);
-  REGISTER_PROCESS(FemMembraneDiffusionAnisotropySetDirichlet);
-  REGISTER_PROCESS(FemMembraneDiffusionAnisotropyVisualize);
-  REGISTER_PROCESS(FemMembraneDiffusionAnisotropySolver);
-  REGISTER_PROCESS(FemMembraneCreateAnisotropyMorphogenElement);
-  REGISTER_PROCESS(FemMembraneDiffusionGrowthDerivs);
-  REGISTER_PROCESS(FemMembraneDiffusionGrowthDirichletDerivs);
-  REGISTER_PROCESS(FemMembraneDiffusionGrowthSetDirichlet);
-  REGISTER_PROCESS(FemMembraneDiffusionGrowthVisualize);
-  REGISTER_PROCESS(FemMembraneDiffusionGrowthSolver);
-  REGISTER_PROCESS(FemMembraneCreateGrowthMorphogenElement);
-
-
-  REGISTER_PROCESS(FemMembraneVisMaterial);
-  REGISTER_PROCESS(FemMembraneVisGrowth);
-  REGISTER_PROCESS(FemMembraneComputeCurrentDirections);
-  REGISTER_PROCESS(FemMembraneVisDirections);
-  //REGISTER_PROCESS(FemMembraneRender);
-  REGISTER_PROCESS(FemAnisotropyPropagationFailure);
 
   REGISTER_PROCESS(AssignCellTypeForShapeQuantifier);
 

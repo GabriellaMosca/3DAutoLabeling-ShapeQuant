@@ -1,10 +1,10 @@
 // Parameters for MorphoDynamX
 [Main]
 MDXVersion: 2.0
-MDXRevision: 2-672-gb342f639
+MDXRevision: 2-689
 ClearColor: 0
 SurfOffset: 0.01
-Slices: 1024
+Slices: 50
 ScreenSampling: 1
 TileCount: 20
 MaxTexSize: 1024 1024 1024
@@ -65,54 +65,54 @@ Stack2StackBoundingBox: 0.501961 0.501961 0.501961 1
 DrawClipBox: false
 Spinning: 10000
 FlySpeed: 0.005
-Brightness: 0
-Contrast: 1
+Brightness: 0.093
+Contrast: 1.3604
 Shininess: 32
 Specular: 0.2
 UnsharpStrength: 1
 MaxNbPeels: 10
-CameraFrame: 0.925167 0.308854 0.220623 0 -0.321795 0.946495 0.02441 0 -0.201279 -0.0935786 0.975054 0 -1.3463 2.57021 -141.292 1
+CameraFrame: -0.971769 -0.0961759 -0.215444 0 -0.0818546 0.993859 -0.0744583 0 0.221282 -0.0547212 -0.973673 0 -1.86251 2.557 -132.145 1
 SceneRadius: 500
-CameraZoom: -0.0464
+CameraZoom: -0.2456
 
 
 [Clip1]
 Enable: false
 Grid: false
-Width: 0.510093
+Width: 0.511407
 GridSize: 1
 GridSquares: 3
 GridColor: 11
 Normal: 1 0 0
-Frame: 1 0 0 0 0 1 0 0 0 0 1 0 -27.6512 13.5805 5.71972 1
+Frame: 0.424476 -0.849841 0.312394 0 0.616523 0.0186019 -0.787117 0 0.663113 0.526711 0.531843 0 -10.2021 -4.96116 2.88376 1
 
 
 [Clip2]
 Enable: true
 Grid: false
-Width: 50.3419
+Width: 50.4716
 GridSize: 1
 GridSquares: 3
 GridColor: 12
 Normal: 0 1 0
-Frame: 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+Frame: 0.0135928 -0.511689 -0.859063 0 0.438703 -0.768984 0.464976 0 -0.898529 -0.383194 0.214027 0 -1.8948 2.07063 -8.01022 1
 
 
 [Clip3]
-Enable: true
+Enable: false
 Grid: false
-Width: 8.39249
+Width: 8.4099
 GridSize: 1
 GridSquares: 3
 GridColor: 13
 Normal: 0 0 1
-Frame: 1 0 0 0 0 1 0 0 0 0 1 0 24.9959 -20.4838 1.43567 1
+Frame: -0.391875 -0.0673354 -0.917551 0 0.141589 -0.989851 0.0121703 0 -0.909058 -0.125146 0.397431 0 -8.7724 5.4988 1.99691 1
 
 
 [Stack1]
 StackFile: 
 WorkStackFile: 
-MeshFile: EM_C_200_3DCellTissue.mdxm
+MeshFile: ../../../../../media/gabriella/245D-D52E/EM_C_204_cell_3DTissueScoperchiata.mdxm
 MainShow: false
 MainBright:1
 MainOpacity:0.8
@@ -124,7 +124,7 @@ WorkOpacity:0.8
 Work16Bit:false
 WorkLabels:false
 SurfBright:1
-SurfOpacity:1
+SurfOpacity:0.8029
 SurfBlend:false
 SurfCull:true
 SurfShade:true
@@ -188,11 +188,11 @@ DrawCutSurf: false
 Mode: 0
 CutSurfGrid: false
 Material: 0
-Size: 1.00183 1.00183 1.00183
+Size: 1.00322 1.00322 1.00322
 SurfSize: 15 15
 LineWidth: 1
 BezPoints: 5 5
-Frame: 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+Frame: -0.87304 -0.0844109 -0.480288 0 -0.0203832 0.990361 -0.137005 0 0.487223 -0.109821 -0.866345 0 0 0 0 1
 BezPointList: -7.5 -7.5 0
 BezPointList: -3.75 -7.5 0
 BezPointList: 0 -7.5 0
@@ -223,26 +223,26 @@ BezPointList: 7.5 7.5 0
 AutoScale: true
 Unit:m
 MinSize: 50
-MaxSize: 200
+MaxSize: 400
 AutoUnit: true
 Position: BottomRight
 Direction: Horizontal
 TextPosition: Out
-Thickness: 5
+Thickness: 20
 ShiftBorder: 20 20
-FontSize: 12
+FontSize: 35
 
 [ColorBar]
 ScaleLength: 0.3
-Width: 20
+Width: 40
 DistanceToBorder: 5
-TextToBar: 5
-TickSize: 2
+TextToBar: 8
+TickSize: 5
 ExpSize: 0.7
 Epsilon: 1e-09
-LineWidth: 2
+LineWidth: 6
 Position: TopLeft
-FontSize: 10
+FontSize: 20
 Orientation: Vertical
 
 [Process]
@@ -1019,9 +1019,9 @@ ParmString: Yes
 ParmName: Blending
 ParmString: 0.8
 ParmName: Point Size
-ParmString: 1.0
+ParmString: 0
 ParmName: Line Width
-ParmString: 1.0
+ParmString: 10
 ParmName: Axis Offset
 ParmString: 0.02
 ParmName: Default Color
@@ -1088,386 +1088,6 @@ ProcessName: Mesh/System/ToDo Soeren/Load Cell Graph Ply File
 NumParms: 1
 ParmName: File Name
 ParmString: 
-ProcessName: Model/CCF/01 FEM Membranes
-NumParms: 4
-ParmName: Solver Process
-ParmString: Model/CCF/02 Solver
-ParmName: Trichome Process
-ParmString: Model/CCF/14  Set Trichome Growth
-ParmName: Growth Process
-ParmString: Model/CCF/13 Growth
-ParmName: Subdivide Process
-ParmString: Model/CCF/14 Subdivide
-ProcessName: Model/CCF/02 FEM Solver
-NumParms: 17
-ParmName: Step
-ParmString: 10
-ParmName: Dt
-ParmString: 0.01
-ParmName: Min Dt
-ParmString: .0001
-ParmName: Max Dt
-ParmString: 10
-ParmName: Max Norm
-ParmString: 10
-ParmName: Max Steps
-ParmString: 10
-ParmName: Method
-ParmString: Euler
-ParmName: Solver Type
-ParmString: Bi-conjugate Gradient Stabilized
-ParmName: CG Max Iter
-ParmString: 50
-ParmName: CG Tolerance
-ParmString: 1e-6
-ParmName: Print Stats
-ParmString: Yes
-ParmName: Converge Threshold
-ParmString: 10e-6
-ParmName: Stress-Strain
-ParmString: Model/CCF/05 Stress-Strain
-ParmName: Element Derivs
-ParmString: Model/CCF/03 Triangle Derivs
-ParmName: Pressure Derivs
-ParmString: Model/CCF/10 Pressure Derivs
-ParmName: Pressure Edge Derivs
-ParmString: Model/CCF/10b Pressure Edge Derivs
-ParmName: Dirichlet Derivs
-ParmString: Model/CCF/16 Dirichlet Derivs
-ProcessName: Model/CCF/03 Triangle Derivs
-NumParms: 9
-ParmName: Element Type
-ParmString: Linear Triangle
-ParmName: Element Attribute
-ParmString: Triangle Element
-ParmName: Material Attribute
-ParmString: TransIso Material
-ParmName: Delta
-ParmString: 1e-8
-ParmName: OMP Get Set
-ParmString: Yes
-ParmName: OMP Derivs
-ParmString: No
-ParmName: OMP Jac Diag
-ParmString: No
-ParmName: OMP Jac Nhbs
-ParmString: No
-ParmName: Analytic Jacobian
-ParmString: No
-ProcessName: Model/CCF/04 Reference Configuration
-NumParms: 3
-ParmName: Element Type
-ParmString: Linear Triangle
-ParmName: Element Attribute
-ParmString: Triangle Element
-ParmName: Thickness
-ParmString: 1.0
-ProcessName: Model/CCF/05 Stress-Strain
-NumParms: 8
-ParmName: Stress Heat Name
-ParmString: Stress
-ParmName: Strain Heat Name
-ParmString: Strain
-ParmName: Stress Axis Name
-ParmString: Stress
-ParmName: Strain Axis Name
-ParmString: Strain
-ParmName: Axis Scale
-ParmString: 1.0
-ParmName: Element Type
-ParmString: Linear Triangle
-ParmName: Element Attribute
-ParmString: Triangle Element
-ParmName: Material Attribute
-ParmString: TransIso Material
-ProcessName: Model/CCF/06 Material Properties
-NumParms: 5
-ParmName: Young E1E3
-ParmString: 100.0
-ParmName: Young E2
-ParmString: 100.0
-ParmName: Poisson
-ParmString: 0.3
-ParmName: Material Label
-ParmString: 1
-ParmName: Material Attribute
-ParmString: TransIso Material
-ProcessName: Model/CCF/07 Cells to Faces Material
-NumParms: 2
-ParmName: Combine Method
-ParmString: Sum
-ParmName: Material Attribute
-ParmString: TransIso Material
-ProcessName: Model/CCF/08a Set Aniso Dir
-NumParms: 5
-ParmName: Element Type
-ParmString: Linear Triangle
-ParmName: Element Attribute
-ParmString: Triangle Element
-ParmName: Direction Type
-ParmString: E2
-ParmName: Direction
-ParmString: 0.0 0.0 1.0
-ParmName: Tolerance
-ParmString: 1e-6
-ProcessName: Model/CCF/08b Set Aniso Dir Morphogens
-NumParms: 6
-ParmName: Element Type
-ParmString: Linear Triangle
-ParmName: Element Attribute
-ParmString: Triangle Element
-ParmName: Direction Type
-ParmString: E2
-ParmName: Direction from Diffusion Gradient
-ParmString: Parallel to Gradient
-ParmName: Morphogen Signal
-ParmString: E2AnisotropyMorphogens
-ParmName: Tolerance
-ParmString: 1e-6
-ProcessName: Model/CCF/09a Set Pressure
-NumParms: 4
-ParmName: Pressure
-ParmString: 0.0
-ParmName: Pressure Label
-ParmString: 1
-ParmName: Pressure Attribute
-ParmString: Fem Pressure
-ParmName: Element Attribute
-ParmString: Triangle Element
-ProcessName: Model/CCF/09b Set Edge Pressure
-NumParms: 4
-ParmName: Pressure Edge
-ParmString: 0.0
-ParmName: Pressure Edge Label
-ParmString: 1
-ParmName: Pressure Edge Attribute
-ParmString: Fem Edge Pressure
-ParmName: Element Attribute
-ParmString: Triangle Element
-ProcessName: Model/CCF/10a Pressure Derivs
-NumParms: 7
-ParmName: Delta
-ParmString: 1e-20
-ParmName: OMP Get Set
-ParmString: Yes
-ParmName: OMP Derivs
-ParmString: No
-ParmName: OMP Jac Diag
-ParmString: No
-ParmName: OMP Jac Nhbs
-ParmString: No
-ParmName: Pressure Attribute
-ParmString: Fem Pressure
-ParmName: Element Attribute
-ParmString: Triangle Element
-ProcessName: Model/CCF/10b Pressure Edge Derivs
-NumParms: 7
-ParmName: Delta
-ParmString: 1e-20
-ParmName: OMP Get Set
-ParmString: Yes
-ParmName: OMP Derivs
-ParmString: No
-ParmName: OMP Jac Diag
-ParmString: No
-ParmName: OMP Jac Nhbs
-ParmString: No
-ParmName: Pressure Edge Attribute
-ParmString: Fem Edge Pressure
-ParmName: Element Attribute
-ParmString: Triangle Element
-ProcessName: Model/CCF/11a Set Growth
-NumParms: 11
-ParmName: KPar
-ParmString: 0.0
-ParmName: KPer
-ParmString: 0.0
-ParmName: KIso
-ParmString: 0.0
-ParmName: KPar Strain
-ParmString: 0.0
-ParmName: KPer Strain
-ParmString: 0.0
-ParmName: KIso Strain
-ParmString: 0.0
-ParmName: KPar Thresh
-ParmString: 0.01
-ParmName: KPer Thresh
-ParmString: 0.01
-ParmName: KIso Thresh
-ParmString: 0.01
-ParmName: Growth Label
-ParmString: 1
-ParmName: Growth Attribute
-ParmString: Fem Growth
-ProcessName: Model/CCF/11b Set Growth Morphogens (on Faces)
-NumParms: 9
-ParmName: Growth Attribute
-ParmString: Fem Growth
-ParmName: Morphogen Signal 1
-ParmString: 
-ParmName: Morphogen Signal 2
-ParmString: 
-ParmName: KPar scaling factor 1
-ParmString: 1.
-ParmName: KPer scaling factor 1
-ParmString: 0.
-ParmName: KPar scaling factor 2
-ParmString: 1.
-ParmName: KPer scaling factor 2
-ParmString: 0.
-ParmName: KIso scaling factor 1
-ParmString: 1.
-ParmName: KIso scaling factor 2
-ParmString: 0.
-ProcessName: Model/CCF/12 Cells to Faces Growth
-NumParms: 2
-ParmName: Combine Method
-ParmString: Average
-ParmName: Growth Attribute
-ParmString: Fem Growth
-ProcessName: Model/CCF/13 Growth
-NumParms: 5
-ParmName: Growth Dt
-ParmString: 0.01
-ParmName: Projection tolerance
-ParmString: 1.e-6
-ParmName: Element Type
-ParmString: Linear Triangle
-ParmName: Element Attribute
-ParmString: Triangle Element
-ParmName: Growth Attribute
-ParmString: Fem Growth
-ProcessName: Model/CCF/14 Set Trichome Growth
-NumParms: 12
-ParmName: Initial sources Set
-ParmString: InitialSet.txt
-ParmName: Secondary sources Set
-ParmString: SecondarySet.txt
-ParmName: Distance boundary-tip
-ParmString: 40
-ParmName: Effective distance for growth
-ParmString: 10.
-ParmName: Effective distance for Secondary Growth
-ParmString: 5
-ParmName: Decaying factor for distance Secondary Growth
-ParmString: 1
-ParmName: Growth scaling factor
-ParmString: 0.01
-ParmName: FemMembranes Process name
-ParmString: Model/CCF/01 FEM Membranes
-ParmName: Hodge Attribute
-ParmString: Hodge Values
-ParmName: Growth Attribute
-ParmString: Fem Growth
-ParmName: Distance field 1 Signal
-ParmString: Distance Primary
-ParmName: Distance field 2 Signal
-ParmString: Distance Secondary
-ProcessName: Model/CCF/14 Subdivide
-NumParms: 17
-ParmName: Max Area
-ParmString: 0.0
-ParmName: Element Attribute
-ParmString: Triangle Element
-ParmName: Material Attribute
-ParmString: TransIso Material
-ParmName: Pressure Attribute
-ParmString: Fem Pressure
-ParmName: Pressure Edge Attribute
-ParmString: Fem Edge Pressure
-ParmName: Growth Attribute
-ParmString: Fem Growth
-ParmName: Dirichlet Attribute
-ParmString: Fem Dirichlet
-ParmName: Morphogen Anisotropy Element Attribute
-ParmString: Morphogen Triangle Element Growth
-ParmName: Morphogen Growth Element Attribute
-ParmString: Morphogen Triangle Element Growth
-ParmName: Morphogen Anisotropy E2 Data
-ParmString: AnisotropyE2Morphogen
-ParmName: Morphogen Anisotropy KPar Data
-ParmString: AnisotropyKParMorphogen
-ParmName: Morphogen Anisotropy E2 Dirichlet
-ParmString: AnisotropyE2Dirichlet
-ParmName: Morphogen Anisotropy KPar Dirichlet
-ParmString: AnisotropyKParDirichelt
-ParmName: Morphogen Growth Data 1
-ParmString: GrowthMorphogen1
-ParmName: Morphogen Growth Data 2
-ParmString: GrowthMorphogen2
-ParmName: Morphogen Growth Dirichlet 1
-ParmString: GrowthDirichlet1
-ParmName: Morphogen Growth Dirichlet 2
-ParmString: GrowthDirichlet2
-ProcessName: Model/CCF/15 Set Dirichlet
-NumParms: 2
-ParmName: Dirichlet Labels
-ParmString: 1 1 1
-ParmName: Dirichlet Attribute
-ParmString: Fem Dirichlet
-ProcessName: Model/CCF/16 Dirichlet Derivs
-NumParms: 6
-ParmName: Delta
-ParmString: 1e-6
-ParmName: OMP Get Set
-ParmString: Yes
-ParmName: OMP Derivs
-ParmString: No
-ParmName: OMP Jac Diag
-ParmString: No
-ParmName: OMP Jac Nhbs
-ParmString: No
-ParmName: Dirichlet Attribute
-ParmString: Fem Dirichlet
-ProcessName: Model/CCF/17 Compute Current Directions
-NumParms: 3
-ParmName: Element Type
-ParmString: Linear Triangle
-ParmName: Element Attribute
-ParmString: Triangle Element
-ParmName: Projection Tolerance
-ParmString: 1.e-6
-ProcessName: Model/CCF/18 Visualize Directions
-NumParms: 5
-ParmName: Material Axis Name
-ParmString: Material Direction
-ParmName: Growth Axis Name
-ParmString: Growth Direction
-ParmName: Axis Scale
-ParmString: 1.0
-ParmName: Element Type
-ParmString: Linear Triangle
-ParmName: Element Attribute
-ParmString: Triangle Element
-ProcessName: Model/CCF/20 Visualize Material
-NumParms: 4
-ParmName: Visualize
-ParmString: Young E1E3
-ParmName: Signal Name
-ParmString: 
-ParmName: Label Name
-ParmString: Material Labels
-ParmName: Material Attribute
-ParmString: TransIso Material
-ProcessName: Model/CCF/21 Visualize Growth
-NumParms: 4
-ParmName: Visualize
-ParmString: KPar
-ParmName: Signal Name
-ParmString: 
-ParmName: Label Name
-ParmString: Growth Labels
-ParmName: Growth Attribute
-ParmString: Fem Growth
-ProcessName: Model/CCF/22 Display Anisotropy Propagation Failure
-NumParms: 3
-ParmName: Element Type
-ParmString: Linear Triangle
-ParmName: Element Attribute
-ParmString: Triangle Element
-ParmName: Direction Type
-ParmString: E2
 ProcessName: Model/CCF/50 Set Cell Type
 NumParms: 2
 ParmName: Assign cell type for selected cells
@@ -1477,9 +1097,9 @@ ParmString: CellShapeData
 ProcessName: Model/CCF/60 Shape Quantifier/00 Global Shape Quantifier Process
 NumParms: 7
 ParmName: Compute Skew Symmetric tensor process
-ParmString: Model/CCF/60 Shape Quantifier/01 Compute Skew Symmetric Tensor
+ParmString: Model/CCF/60 Shape Quantifier/01 Compute Covariance Matrix
 ParmName: Compute Antisymmetry tensor process
-ParmString: Model/CCF/60 Shape Quantifier/02 Compute Antisymmetry Tensor
+ParmString: Model/CCF/60 Shape Quantifier/02 Compute Antisymmetry Matrix
 ParmName: Compute periclinal wall surface ratio for L2 cells
 ParmString: Model/CCF/60 Shape Quantifier/03 Compute L2 periclinal surface ratio for selected ovule zone
 ParmName: Cell volume from heatmap process name
@@ -1490,11 +1110,11 @@ ParmName: Visualize shape field process
 ParmString: Model/CCF/60 Shape Quantifier/04 Visualize Shape Field
 ParmName: Write Periclinal wall ratio to a file for selected cells
 ParmString: testShapeQuantifier.csv
-ProcessName: Model/CCF/60 Shape Quantifier/01 Compute Skew Symmetric Tensor
+ProcessName: Model/CCF/60 Shape Quantifier/01 Compute Covariance Matrix
 NumParms: 1
 ParmName: Shape Attribute Name
 ParmString: CellShapeData
-ProcessName: Model/CCF/60 Shape Quantifier/02 Compute Antisymmetry Tensor
+ProcessName: Model/CCF/60 Shape Quantifier/02 Compute Antisymmetry Matrix
 NumParms: 1
 ParmName: Shape Attribute Name
 ParmString: CellShapeData
@@ -1505,13 +1125,19 @@ ParmString: 0.01
 ParmName: Shape Attribute Name
 ParmString: CellShapeData
 ProcessName: Model/CCF/60 Shape Quantifier/04 Visualize Shape Field
-NumParms: 3
+NumParms: 6
 ParmName: Shape Attribute Name
 ParmString: CellShapeData
 ParmName: Output CC
 ParmString: Draw cell anisotropy
 ParmName: Anisotropy Vector Size
-ParmString: 4
+ParmString: 8
+ParmName: Visualize Max Anisotropy Vector
+ParmString: True
+ParmName: Visualize Mid Anisotropy Vector
+ParmString: True
+ParmName: Visualize Min Anisotropy Vector
+ParmString: True
 ProcessName: Model/CCF/70 Write Shape Quantifier
 NumParms: 3
 ParmName: Cell Shape quantifier attribute name
@@ -1520,198 +1146,6 @@ ParmName: Cell Volume Signal Attribute
 ParmString: Volume
 ParmName: File Name
 ParmString: Ovule_EM_C_Test.csv
-ProcessName: Model/CCF/Fem Diffusion Anisotropy/00 Diffusion Solver
-NumParms: 15
-ParmName: Step
-ParmString: 10
-ParmName: Dt
-ParmString: 0.01
-ParmName: Min Dt
-ParmString: .0001
-ParmName: Max Dt
-ParmString: 10
-ParmName: Max Norm
-ParmString: 10
-ParmName: Max Steps
-ParmString: 10
-ParmName: Method
-ParmString: Euler
-ParmName: Solver Type
-ParmString: Bi-conjugate Gradient Stabilized
-ParmName: CG Max Iter
-ParmString: 50
-ParmName: CG Tolerance
-ParmString: 1e-6
-ParmName: Print Stats
-ParmString: Yes
-ParmName: Visualize Process
-ParmString: Model/CCF/Fem Diffusion Anisotropy/05 Morphogen Visualize
-ParmName: Converge Threshold
-ParmString: 10e-6
-ParmName: Element Diffusion Derivs
-ParmString: Model/CCF/Fem Diffusion Anisotropy/01 Diffusion Derivatives
-ParmName: Dirichlet Derivs
-ParmString: Model/CCF/Fem Diffusion Anisotropy/02 Dirichlet Derivatives
-ProcessName: Model/CCF/Fem Diffusion Anisotropy/01 Diffusion Derivatives
-NumParms: 9
-ParmName: Element Type
-ParmString: Linear Triangle
-ParmName: Element Attribute
-ParmString: Morphogen Triangle Element
-ParmName: Morphogen Attribute
-ParmString: AnisotropyE2Morphogen
-ParmName: Delta
-ParmString: 1e-6
-ParmName: Diffusion Constant
-ParmString: 1
-ParmName: OMP Get Set
-ParmString: Yes
-ParmName: OMP Derivs
-ParmString: No
-ParmName: OMP Jac Diag
-ParmString: No
-ParmName: OMP Jac Nhbs
-ParmString: No
-ProcessName: Model/CCF/Fem Diffusion Anisotropy/02 Dirichlet Derivatives
-NumParms: 7
-ParmName: Delta
-ParmString: 1e-6
-ParmName: OMP Get Set
-ParmString: Yes
-ParmName: OMP Derivs
-ParmString: No
-ParmName: OMP Jac Diag
-ParmString: No
-ParmName: OMP Jac Nhbs
-ParmString: No
-ParmName: Dirichlet Attribute
-ParmString: AnisotropyE2Dirichlet
-ParmName: Morphogen Attribute
-ParmString: AnisotropyE2Morphogen
-ProcessName: Model/CCF/Fem Diffusion Anisotropy/03 Set Diffusion Dirchlet
-NumParms: 4
-ParmName: Labels
-ParmString: 1
-ParmName: Values
-ParmString: 1.0
-ParmName: Morphogen Attribute
-ParmString: AnisotropyE2Morphogen
-ParmName: Dirichlet Attribute
-ParmString: AnisotropyE2Dirichlet
-ProcessName: Model/CCF/Fem Diffusion Anisotropy/04 Create Diffusion Element
-NumParms: 2
-ParmName: Element Type
-ParmString: Linear Triangle
-ParmName: Element Attribute
-ParmString: Morphogen Triangle Element
-ProcessName: Model/CCF/Fem Diffusion Anisotropy/05 Morphogen Visualize
-NumParms: 5
-ParmName: Morphogen Attribute
-ParmString: AnisotropyE2Morphogen
-ParmName: Morphogen Signal
-ParmString: E2Morphogen Signal
-ParmName: Morphogen Axis
-ParmString: Morphogen Gradient
-ParmName: Element Type
-ParmString: Linear Triangle
-ParmName: Element Attribute
-ParmString: Morphogen Triangle Element
-ProcessName: Model/CCF/Fem Diffusion Growth/00 Diffusion Solver
-NumParms: 15
-ParmName: Step
-ParmString: 10
-ParmName: Dt
-ParmString: 0.01
-ParmName: Min Dt
-ParmString: .0001
-ParmName: Max Dt
-ParmString: 10
-ParmName: Max Norm
-ParmString: 10
-ParmName: Max Steps
-ParmString: 10
-ParmName: Method
-ParmString: Euler
-ParmName: Solver Type
-ParmString: Bi-conjugate Gradient Stabilized
-ParmName: CG Max Iter
-ParmString: 50
-ParmName: CG Tolerance
-ParmString: 1e-6
-ParmName: Print Stats
-ParmString: Yes
-ParmName: Visualize Process
-ParmString: Model/CCF/Fem Diffusion Growth/05 Morphogen Visualize
-ParmName: Converge Threshold
-ParmString: 10e-6
-ParmName: Element Diffusion Derivs
-ParmString: Model/CCF/Fem Diffusion Growth/01 Diffusion Derivatives
-ParmName: Dirichlet Derivs
-ParmString: Model/CCF/Fem Diffusion Growth/02 Dirichlet Derivatives
-ProcessName: Model/CCF/Fem Diffusion Growth/01 Diffusion Derivatives
-NumParms: 9
-ParmName: Element Type
-ParmString: Linear Triangle
-ParmName: Element Attribute
-ParmString: Morphogen Triangle Element
-ParmName: Morphogen Attribute
-ParmString: GrowthMorphogen1
-ParmName: Delta
-ParmString: 1e-6
-ParmName: Diffusion Constant
-ParmString: 1
-ParmName: OMP Get Set
-ParmString: Yes
-ParmName: OMP Derivs
-ParmString: No
-ParmName: OMP Jac Diag
-ParmString: No
-ParmName: OMP Jac Nhbs
-ParmString: No
-ProcessName: Model/CCF/Fem Diffusion Growth/02 Dirichlet Derivatives
-NumParms: 7
-ParmName: Delta
-ParmString: 1e-6
-ParmName: OMP Get Set
-ParmString: Yes
-ParmName: OMP Derivs
-ParmString: No
-ParmName: OMP Jac Diag
-ParmString: No
-ParmName: OMP Jac Nhbs
-ParmString: No
-ParmName: Dirichlet Attribute
-ParmString: GrowthDirichlet1
-ParmName: Morphogen Attribute
-ParmString: GrowthMorphogen1
-ProcessName: Model/CCF/Fem Diffusion Growth/03 Set Diffusion Dirchlet
-NumParms: 4
-ParmName: Labels
-ParmString: 1
-ParmName: Values
-ParmString: 1.0
-ParmName: Morphogen Attribute
-ParmString: GrowthMorphogen1
-ParmName: Dirichlet Attribute
-ParmString: GrowthDirichlet1
-ProcessName: Model/CCF/Fem Diffusion Growth/04 Create Diffusion Element
-NumParms: 2
-ParmName: Element Type
-ParmString: Linear Triangle
-ParmName: Element Attribute
-ParmString: Morphogen Triangle Element
-ProcessName: Model/CCF/Fem Diffusion Growth/05 Morphogen Visualize
-NumParms: 5
-ParmName: Morphogen Attribute
-ParmString: GrowthMorphogen1
-ParmName: Morphogen Signal
-ParmString: Growth1 Morph Signal
-ParmName: Morphogen Axis
-ParmString: Morphogen Gradient
-ParmName: Element Type
-ParmString: Linear Triangle
-ParmName: Element Attribute
-ParmString: Morphogen Triangle Element
 ProcessName: Model/Diffusion/00 Initialize attribute from selected vertices
 NumParms: 2
 ParmName: Complex Name
