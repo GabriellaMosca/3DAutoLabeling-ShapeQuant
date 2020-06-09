@@ -1,0 +1,3 @@
+Cell Index, Cell Type, Volume, Top Surface Area (top Periclinal cell wall), Bottom Surface Area (bottom Periclinal cell wall), Top/Bottom ratio, Max anisotropy length, Max/Mid anisotropy, Max/Min anisotropy, Max anisotropy eigenVec x, Max eigenVec anisotropy y, Max eigenVec anisotropy z
+786, pSMC, 0, -1, -1, -1, 6.24238, 1.53458, 2.45819, 0.361679, -0.436443, -0.823836
+597, pSMC, 0, -1, -1, -1, 9.98344, 1.64789, 3.17969, -0.429573, 0.0284287, -0.902584
