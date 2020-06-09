@@ -17,10 +17,15 @@ namespace mdx
     shapeAttr = &mesh->attributes().attrMap<CCIndex,CellShapeData >(parm("Shape Attribute Name"));
     
     cellType = stringToCellType(parm("Assign cell type for selected cells"));
-    for(CCIndex c : cs.cellsOfDimension(3))
-    {
-      if ((*indexAttr)[c].selected == true){   
-        (*shapeAttr)[c].cellType = cellType;
+    CCIndexVec volumes = selectedVolumes(cs, *indexAttr);
+    if (volumes.size() == 0) {
+      forall(CCIndex f, cs.cellsOfDimension(3))
+        volumes.push_back(f);
+    }
+    for(uint i = 0; i < volumes.size(); i++) {
+       CCIndex f = volumes[i];
+       if ((*indexAttr)[f].selected == true){   
+        (*shapeAttr)[f].cellType = cellType;
         //mdxInfo<< "Cell type assigned is: " << cellType << endl;
         //mdxInfo<< "Shape attr cell type " << (*shapeAttr)[c].cellType << endl;
       }
@@ -322,9 +327,16 @@ namespace mdx
     CCIndexDoubleAttr &CellTypeAttr = mesh->signalAttr<double>("CellTypeAttr");      
     
     out = CCStructure(2);
-    forall(CCIndex f, src.cellsOfDimension(3)) {
+    CCIndexVec volumes = selectedVolumes(src, *indexAttr);
+    if (volumes.size() == 0) {
+      forall(CCIndex f, src.cellsOfDimension(3))
+        volumes.push_back(f);
+    }
+    for(uint i = 0; i < volumes.size(); i++) {
+       CCIndex f = volumes[i];
+
        //as a scalar I plot the max Dimension/ mid Dimension
-       (anisoAttr)[f] = ((*shapeAttr)[f].skewSymmetricTensor[0][2] / (*shapeAttr)[f].skewSymmetricTensor[1][2]);  
+       (anisoAttr)[f] = ((*shapeAttr)[f].skewSymmetricTensor[0][2] / ((*shapeAttr)[f].skewSymmetricTensor[0][2] + (*shapeAttr)[f].skewSymmetricTensor[1][2] + (*shapeAttr)[f].skewSymmetricTensor[2][2]));  
        (maxElongAttr)[f]= (*shapeAttr)[f].skewSymmetricTensor[0][2];
        (maxAsymmetryAttr)[f] = (*shapeAttr)[f].asymmetry[0];
        (midAsymmetryAttr)[f] = (*shapeAttr)[f].asymmetry[1];
@@ -479,12 +491,12 @@ namespace mdx
     QTextStream out(&file);
 
     // Write header
-    out << QString("Cell Index, Cell Type, Volume, Top Surface Area (top Periclinal cell wall), Bottom Surface Area (bottom Periclinal cell wall), Top/Bottom ratio, Max anisotropy length, Max/Mid anisotropy, Max/Min anisotropy") << endl;
+    out << QString("Cell Index, Cell Type, Volume, Top Surface Area (top Periclinal cell wall), Bottom Surface Area (bottom Periclinal cell wall), Top/Bottom ratio, Max anisotropy length, Max/Mid anisotropy, Max/Min anisotropy, Max anisotropy eigenVec x, Max eigenVec anisotropy y, Max eigenVec anisotropy z") << endl;
     
     forall(CCIndex f, src.cellsOfDimension(3)) {
       if((*indexAttr)[f].selected)
       {
-        out << (*indexAttr)[f].label << ", " << CellTypeToString((*shapeAttr)[f].cellType) << ", " << (*volumeHeatAttr)[(*indexAttr)[f].label] << ", " << (*shapeAttr)[f].topPericlinalWallArea << ", " << (*shapeAttr)[f].bottomPericlinalWallArea << ", " << (*shapeAttr)[f].L2periclinalRatio << ", " << (*shapeAttr)[f].skewSymmetricTensor[0][2]<< ", " << (*shapeAttr)[f].skewSymmetricTensor[0][2]/ (*shapeAttr)[f].skewSymmetricTensor[1][2] << ", " << (*shapeAttr)[f].skewSymmetricTensor[0][2]/ (*shapeAttr)[f].skewSymmetricTensor[2][2] << endl;
+        out << (*indexAttr)[f].label << ", " << CellTypeToString((*shapeAttr)[f].cellType) << ", " << (*volumeHeatAttr)[(*indexAttr)[f].label] << ", " << (*shapeAttr)[f].topPericlinalWallArea << ", " << (*shapeAttr)[f].bottomPericlinalWallArea << ", " << (*shapeAttr)[f].L2periclinalRatio << ", " << (*shapeAttr)[f].skewSymmetricTensor[0][2]<< ", " << (*shapeAttr)[f].skewSymmetricTensor[0][2]/ (*shapeAttr)[f].skewSymmetricTensor[1][2] << ", " << (*shapeAttr)[f].skewSymmetricTensor[0][2]/ (*shapeAttr)[f].skewSymmetricTensor[2][2] << ", " << (*shapeAttr)[f].skewSymmetricTensor[0][0] <<  ", " << (*shapeAttr)[f].skewSymmetricTensor[1][0] <<  ", " << (*shapeAttr)[f].skewSymmetricTensor[2][0] <<endl;
       }
     }
     setStatus(QString("Shape analysis CSV file written" ));
