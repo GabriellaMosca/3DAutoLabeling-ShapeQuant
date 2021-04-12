@@ -1,7 +1,8 @@
 # 3DAutoLabeling-ShapeQuant
 Plugin for MorphoMechanX to classify in semi-automated way cell type in the ovule (L1 and pSMC/SMC  need to be selected) and to quantify principal axes of elongations in each cell
 
-To run this model on the test mesh provided, get MorphoMechanX first (you can find it here: www.morphomechanx.org). 
+To run this model on the test mesh provided, get MorphoMechanX first (you can find it here: www.morphomechanx.org). As a reference, this model is guaranteed to run against version 2.0.2-858 (git commit: 8eb2aec9055221e3e351ffe064bd059186717374)
+
 After installing MorphoMechnX(part of MorphoDynamX modeling environment) this plugin won't need any further installation.
 
 Download the plugin from this git repository and put it into a folder.
