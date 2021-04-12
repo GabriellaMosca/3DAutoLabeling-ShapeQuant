@@ -30,7 +30,7 @@ The results will be reported in a csv file. Its name can be specified into the "
 
 Model/CCF/60 Shape and Connectivity Quantifiers/05 Write Shape and Connectivity Quantifiers  (run this process to save the fields to a file).
 
-Within this Git repo, there is also a video Tutorial available. 
+Within this Git repo, there is also a video Tutorial available (https://github.com/GabriellaMosca/3DAutoLabeling-ShapeQuant/blob/master/Tutorial.mp4) . 
 
 For further information refer to the Appendix 1 provided with the paper (Hernandez-Lagana, Mosca, Mendocilla-Sato et al.). The Appendix can be found as pre-print also here https://www.biorxiv.org/content/10.1101/2020.07.30.226670v3.supplementary-material under "Supplemental File 1"
 
